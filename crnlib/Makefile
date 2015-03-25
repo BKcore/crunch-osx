@@ -94,3 +94,6 @@ corpus_test.o: ../crunch/corpus_test.cpp
 crunch: $(OBJECTS) crunch.o corpus_gen.o corpus_test.o
 	$(CXX) $(OBJECTS) crunch.o corpus_gen.o corpus_test.o -o crunch $(LINKER_OPTIONS)
 
+clean:
+	rm -f *.o
+	rm -f ../crunch/*.o
