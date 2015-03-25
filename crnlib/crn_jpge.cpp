@@ -12,7 +12,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 
 #include "crn_core.h"
 
