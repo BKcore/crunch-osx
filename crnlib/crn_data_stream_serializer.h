@@ -396,9 +396,7 @@ namespace crnlib
    inline data_stream_serializer& operator<< (data_stream_serializer& serializer, int32 val)          { serializer.write_value(val); return serializer; }
    inline data_stream_serializer& operator<< (data_stream_serializer& serializer, uint32 val)         { serializer.write_uint_vlc(val); return serializer; }
    inline data_stream_serializer& operator<< (data_stream_serializer& serializer, int64 val)          { serializer.write_value(val); return serializer; } 
-   inline data_stream_serializer& operator<< (data_stream_serializer& serializer, uint64 val)         { serializer.write_value(val); return serializer; } 
-   inline data_stream_serializer& operator<< (data_stream_serializer& serializer, long val)           { serializer.write_value(val); return serializer; }
-   inline data_stream_serializer& operator<< (data_stream_serializer& serializer, unsigned long val)  { serializer.write_value(val); return serializer; }
+   inline data_stream_serializer& operator<< (data_stream_serializer& serializer, uint64 val)         { serializer.write_value(val); return serializer; }
    inline data_stream_serializer& operator<< (data_stream_serializer& serializer, float val)          { serializer.write_value(val); return serializer; }
    inline data_stream_serializer& operator<< (data_stream_serializer& serializer, double val)         { serializer.write_value(val); return serializer; }
    inline data_stream_serializer& operator<< (data_stream_serializer& serializer, const char* p)      { serializer.write_c_str(p); return serializer; }
@@ -432,9 +430,7 @@ namespace crnlib
    inline data_stream_serializer& operator>> (data_stream_serializer& serializer, int32& val)          { serializer.read_object(val); return serializer; }
    inline data_stream_serializer& operator>> (data_stream_serializer& serializer, uint32& val)         { serializer.read_uint_vlc(val); return serializer; }
    inline data_stream_serializer& operator>> (data_stream_serializer& serializer, int64& val)          { serializer.read_object(val); return serializer; } 
-   inline data_stream_serializer& operator>> (data_stream_serializer& serializer, uint64& val)         { serializer.read_object(val); return serializer; } 
-   inline data_stream_serializer& operator>> (data_stream_serializer& serializer, long& val)           { serializer.read_object(val); return serializer; }
-   inline data_stream_serializer& operator>> (data_stream_serializer& serializer, unsigned long& val)  { serializer.read_object(val); return serializer; }
+   inline data_stream_serializer& operator>> (data_stream_serializer& serializer, uint64& val)         { serializer.read_object(val); return serializer; }
    inline data_stream_serializer& operator>> (data_stream_serializer& serializer, float& val)          { serializer.read_object(val); return serializer; }
    inline data_stream_serializer& operator>> (data_stream_serializer& serializer, double& val)         { serializer.read_object(val); return serializer; }
       

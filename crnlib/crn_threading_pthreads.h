@@ -14,6 +14,10 @@
 #include <semaphore.h>
 #include <unistd.h>
 
+#ifdef __APPLE__
+#include "osx_pthread_spinlock_shim.h"
+#endif
+
 namespace crnlib
 {
    // g_number_of_processors defaults to 1. Will be higher on multicore machines.
@@ -66,7 +70,7 @@ namespace crnlib
       CRNLIB_NO_COPY_OR_ASSIGNMENT_OP(semaphore);
 
    public:
-      semaphore(long initialCount = 0, long maximumCount = 1, const char* pName = NULL);
+      semaphore(const char* name = NULL, long initialCount = 0, long maximumCount = 1);
       ~semaphore();
 
       void release(long releaseCount = 1);
@@ -74,7 +78,8 @@ namespace crnlib
       bool wait(uint32 milliseconds = cUINT32_MAX);
 
    private:
-      sem_t m_sem;
+      sem_t* m_sem;
+      const char* m_name;
    };
 
    class spinlock

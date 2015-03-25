@@ -12,7 +12,10 @@ namespace crnlib
    typedef uint32             uint;
    typedef signed int         int32;
 
-   #ifdef __GNUC__
+   #ifdef __APPLE__
+      typedef unsigned long         uint64;
+      typedef long                  int64;
+   #elif defined __GNUC__
       typedef unsigned long long    uint64;
       typedef long long             int64;
    #else

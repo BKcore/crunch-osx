@@ -9,14 +9,15 @@
 #ifdef WIN32
 #pragma comment(lib, "../ext/libpthread/lib/pthreadVC2.lib")
 #include "crn_winhdr.h"
-#endif
-
-#ifdef __GNUC__
-#include <sys/sysinfo.h>
-#endif
-
-#ifdef WIN32
 #include <process.h>
+#endif
+
+#if defined(__APPLE__)
+#include <sys/sysctl.h>
+#include <fcntl.h>
+#elif defined(__GNUC__)
+#include <sys/sysinfo.h>
+#include <fcntl.h>
 #endif
 
 namespace crnlib
@@ -29,6 +30,15 @@ namespace crnlib
       SYSTEM_INFO g_system_info;
       GetSystemInfo(&g_system_info);
       g_number_of_processors = math::maximum<uint>(1U, g_system_info.dwNumberOfProcessors);
+#elif defined(__APPLE__)
+      int count;
+      size_t size = sizeof(count);
+
+      if (sysctlbyname("hw.ncpu",&count,&size,NULL,0)) { 
+         g_number_of_processors = 1;
+      } else {
+         g_number_of_processors = count;
+      }
 #elif defined(__GNUC__)
       g_number_of_processors = math::maximum<int>(1, get_nprocs());
 #else
@@ -39,7 +49,7 @@ namespace crnlib
    crn_thread_id_t crn_get_current_thread_id()
    {
       // FIXME: Not portable
-      return static_cast<crn_thread_id_t>(pthread_self());
+      return (crn_thread_id_t)(pthread_self());
    }
 
    void crn_sleep(unsigned int milliseconds)
@@ -104,19 +114,24 @@ namespace crnlib
       count;
    }
 
-   semaphore::semaphore(long initialCount, long maximumCount, const char* pName)
+   semaphore::semaphore(const char* name, long initialCount, long maximumCount)
    {
-      maximumCount, pName;
+      name, maximumCount;
+
       CRNLIB_ASSERT(maximumCount >= initialCount);
-      if (sem_init(&m_sem, 0, initialCount))
+
+      m_name = name;
+      m_sem = sem_open(m_name, O_CREAT, 0644, initialCount);
+      if (m_sem == SEM_FAILED)
       {
-         CRNLIB_FAIL("semaphore: sem_init() failed");
+         CRNLIB_FAIL("semaphore: sem_open() failed");
       }
    }
 
    semaphore::~semaphore()
    {
-      sem_destroy(&m_sem);
+      sem_close(m_sem);
+      sem_unlink(m_name);
    }
 
    void semaphore::release(long releaseCount)
@@ -126,13 +141,13 @@ namespace crnlib
       int status = 0;
 #ifdef WIN32
       if (1 == releaseCount)
-         status = sem_post(&m_sem);
+         status = sem_post(m_sem);
       else
-         status = sem_post_multiple(&m_sem, releaseCount);
+         status = sem_post_multiple(m_sem, releaseCount);
 #else
       while (releaseCount > 0)
       {
-         status = sem_post(&m_sem);
+         status = sem_post(m_sem);
          if (status)
             break;
          releaseCount--;
@@ -151,13 +166,13 @@ namespace crnlib
 
 #ifdef WIN32
       if (1 == releaseCount)
-         sem_post(&m_sem);
+         sem_post(m_sem);
       else
-         sem_post_multiple(&m_sem, releaseCount);
+         sem_post_multiple(m_sem, releaseCount);
 #else
       while (releaseCount > 0)
       {
-         sem_post(&m_sem);
+         sem_post(m_sem);
          releaseCount--;
       }
 #endif
@@ -168,14 +183,12 @@ namespace crnlib
       int status;
       if (milliseconds == cUINT32_MAX)
       {
-         status = sem_wait(&m_sem);
+         status = sem_wait(m_sem);
       }
       else
       {
-         struct timespec interval;
-         interval.tv_sec = milliseconds / 1000;
-         interval.tv_nsec = (milliseconds % 1000) * 1000000L;
-         status = sem_timedwait(&m_sem, &interval);
+         alarm(milliseconds / 1000);
+         status = sem_wait(m_sem);
       }
 
       if (status)
@@ -221,8 +234,8 @@ namespace crnlib
 
    task_pool::task_pool() :
       m_num_threads(0),
-      m_tasks_available(0, 32767),
-      m_all_tasks_completed(0, 1),
+      m_tasks_available("tasks_available", 0, 32767),
+      m_all_tasks_completed("tasks_completed", 0, 1),
       m_total_submitted_tasks(0),
       m_total_completed_tasks(0),
       m_exit_flag(false)
@@ -232,8 +245,8 @@ namespace crnlib
 
    task_pool::task_pool(uint num_threads) :
       m_num_threads(0),
-      m_tasks_available(0, 32767),
-      m_all_tasks_completed(0, 1),
+      m_tasks_available("tasks_available", 0, 32767),
+      m_all_tasks_completed("tasks_completed", 0, 1),
       m_total_submitted_tasks(0),
       m_total_completed_tasks(0),
       m_exit_flag(false)
