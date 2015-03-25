@@ -9,7 +9,7 @@ Note that you'll need g++ 4.8+, this does not work with clang.
 ```
 cd crnlib
 CXX=/path/to/g++4.8+ make
-mv crnlib/crunch bin_osx/crunch
+mv crunch ../bin_osx/crunch
 ```
 
 # Tested on
