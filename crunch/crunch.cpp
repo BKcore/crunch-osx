@@ -115,7 +115,7 @@ public:
 
       console::message("\nImage rescaling (mutually exclusive options)");
       console::printf("-rescale <int> <int> - Rescale image to specified resolution");
-      console::printf("-relscale <float> <float> - Rescale image to specified relative resolution");
+      console::printf("-relrescale <float> <float> - Rescale image to specified relative resolution");
       console::printf("-rescalemode <nearest | hi | lo> - Auto-rescale non-power of two images");
       console::printf(" nearest - Use nearest power of 2, hi - Use next, lo - Use previous");
 
@@ -784,8 +784,8 @@ private:
       }
       else if (m_params.has_key("relrescale"))
       {
-         float w = m_params.get_value_as_float("relrescale", 0, 1, 1, 256, 0);
-         float h = m_params.get_value_as_float("relrescale", 0, 1, 1, 256, 1);
+         float w = m_params.get_value_as_float("relrescale", 0, 1, 0.1f, 256.f, 0);
+         float h = m_params.get_value_as_float("relrescale", 0, 1, 0.1f, 256.f, 1);
 
          mipmap_params.m_scale_mode = cCRNSMRelative;
          mipmap_params.m_scale_x = w;
