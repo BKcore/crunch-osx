@@ -259,11 +259,11 @@ namespace crnlib
 
             return true;
          }
-         
+
          if (!allow_unpacking_to_flip)
             return false;
       }
-      
+
       unpack_from_dxt(uncook_if_necessary_to_unpack);
 
       if (m_orient_flags & cOrientationFlagXFlipped)
@@ -325,7 +325,7 @@ namespace crnlib
 
       image_u8* pImage = crnlib_new<image_u8>();
       pImage->set_comp_flags(pixel_format_helpers::get_component_flags(fmt));
-      
+
       if (!pImage->resize(pImg->get_width(), pImg->get_height()))
          return false;
 
@@ -405,7 +405,7 @@ namespace crnlib
 
       return &tmp;
    }
-   
+
    bool mip_level::flip_x()
    {
       if (!is_valid())
@@ -512,7 +512,7 @@ namespace crnlib
 
       return *this;
    }
-   
+
    bool mipmapped_texture::read_dds(data_stream_serializer& serializer)
    {
       if (!read_dds_internal(serializer))
@@ -740,7 +740,7 @@ namespace crnlib
       {
          pitch = desc.lPitch;
       }
-                  
+
       if (!pitch)
          pitch = default_pitch;
 #if 0
@@ -814,7 +814,7 @@ namespace crnlib
                   CRNLIB_ASSERT(0);
                   return false;
                }
-               
+
                CRNLIB_ASSERT(pDXTImage->get_element_vec().size() * sizeof(dxt_image::element) == actual_level_pitch);
 
                if (!serializer.read(&pDXTImage->get_element_vec()[0], actual_level_pitch))
@@ -901,17 +901,17 @@ namespace crnlib
                }
 
                pMip->assign(pImage, m_format);
-               
+
                CRNLIB_ASSERT(pMip->get_comp_flags() == m_comp_flags);
             }
          }
       }
-      
+
       clear_last_error();
 
       if (dxt1_alpha)
          change_dxt1_to_dxt1a();
-      
+
       return true;
    }
 
@@ -1018,7 +1018,7 @@ namespace crnlib
 
       desc.dwSize = sizeof(desc);
       desc.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT | DDSD_CAPS;
-            
+
       desc.dwWidth = m_width;
       desc.dwHeight = m_height;
 
@@ -1063,6 +1063,7 @@ namespace crnlib
             case PIXEL_FMT_DXT1A:
             {
                desc.ddpfPixelFormat.dwFourCC = (uint32)PIXEL_FMT_DXT1;
+               desc.ddpfPixelFormat.dwFlags |= DDPF_ALPHAPIXELS;
                desc.ddpfPixelFormat.dwRGBBitCount = 0;
                break;
             }
@@ -1195,13 +1196,13 @@ namespace crnlib
                if ((can_unflip_packed_texture) && (pLevel->get_orientation_flags() & (cOrientationFlagXFlipped | cOrientationFlagYFlipped)))
                {
                   tmp = *p;
-                  if (pLevel->get_orientation_flags() & cOrientationFlagXFlipped) 
+                  if (pLevel->get_orientation_flags() & cOrientationFlagXFlipped)
                   {
                      if (!tmp.flip_x())
                         console::warning("mipmapped_texture::write_dds: Unable to unflip compressed texture on X axis");
                   }
 
-                  if (pLevel->get_orientation_flags() & cOrientationFlagYFlipped) 
+                  if (pLevel->get_orientation_flags() & cOrientationFlagYFlipped)
                   {
                      if (!tmp.flip_y())
                         console::warning("mipmapped_texture::write_dds: Unable to unflip compressed texture on Y axis");
@@ -1357,7 +1358,7 @@ namespace crnlib
 
       const bool is_compressed_texture = kt.is_compressed();
       dxt_format dxt_fmt = cDXTInvalid;
-      
+
       pixel_packer unpacker;
       if (is_compressed_texture)
       {
@@ -1430,7 +1431,7 @@ namespace crnlib
       }
       else
       {
-         m_format = PIXEL_FMT_A8R8G8B8; 
+         m_format = PIXEL_FMT_A8R8G8B8;
          const uint type_size = get_ogl_type_size(kt.get_ogl_type());
          const uint type_bits = type_size * 8;
 
@@ -1471,7 +1472,7 @@ namespace crnlib
                case KTX_RED:
                case KTX_RED_INTEGER:
                case KTX_R8:
-               case KTX_R8UI: 
+               case KTX_R8UI:
                {
                   unpacker.init("R", -1, type_bits);
                   m_format = PIXEL_FMT_R8G8B8;
@@ -1517,46 +1518,46 @@ namespace crnlib
                   unpacker.init("YA", -1, type_bits);
                   m_format = PIXEL_FMT_A8L8;
                   break;
-               }  
+               }
                case 3:
-               case KTX_SRGB: 
-               case KTX_RGB: 
-               case KTX_RGB_INTEGER: 
-               case KTX_RGB8: 
-               case KTX_SRGB8: 
+               case KTX_SRGB:
+               case KTX_RGB:
+               case KTX_RGB_INTEGER:
+               case KTX_RGB8:
+               case KTX_SRGB8:
                {
                   unpacker.init("RGB", -1, type_bits);
                   m_format = PIXEL_FMT_R8G8B8;
                   break;
-               }  
+               }
                case KTX_BGR:
-               case KTX_BGR_INTEGER: 
+               case KTX_BGR_INTEGER:
                {
                   unpacker.init("BGR", -1, type_bits);
                   m_format = PIXEL_FMT_R8G8B8;
                   break;
-               }  
+               }
                case 4:
-               case KTX_RGBA_INTEGER: 
-               case KTX_RGBA: 
-               case KTX_SRGB_ALPHA: 
-               case KTX_SRGB8_ALPHA8: 
-               case KTX_RGBA8: 
+               case KTX_RGBA_INTEGER:
+               case KTX_RGBA:
+               case KTX_SRGB_ALPHA:
+               case KTX_SRGB8_ALPHA8:
+               case KTX_RGBA8:
                {
                   unpacker.init("RGBA", -1, type_bits);
                   break;
-               }  
+               }
                case KTX_BGRA:
                case KTX_BGRA_INTEGER:
                {
                   unpacker.init("BGRA", -1, type_bits);
                   break;
-               }  
+               }
                default:
                   set_last_error("Unsupported KTX pixel format");
                   return false;
             }
-            
+
             unpacker.set_pixel_stride(unpacker.get_num_comps() * get_ogl_type_size(kt.get_ogl_type()));
          }
 
@@ -1575,14 +1576,14 @@ namespace crnlib
       {
          //  0123456
          // "S=r,T=d"
-         if ((orient[0] == 'S') && (orient[1] == '=') && (orient[3] == ',') && 
+         if ((orient[0] == 'S') && (orient[1] == '=') && (orient[3] == ',') &&
              (orient[4] == 'T') && (orient[5] == '='))
          {
             if (tolower(orient[2]) == 'l')
                x_flipped = true;
             else if (tolower(orient[2]) == 'r')
                x_flipped = false;
-            
+
             if (tolower(orient[6]) == 'u')
                y_flipped = true;
             else if (tolower(orient[6]) == 'd')
@@ -1593,7 +1594,7 @@ namespace crnlib
       orientation_flags_t orient_flags = cDefaultOrientationFlags;
       if (x_flipped) orient_flags = static_cast<orientation_flags_t>(orient_flags | cOrientationFlagXFlipped);
       if (y_flipped) orient_flags = static_cast<orientation_flags_t>(orient_flags | cOrientationFlagYFlipped);
-      
+
       bool dxt1_alpha = false;
 
       for (uint face_index = 0; face_index < num_faces; face_index++)
@@ -1609,7 +1610,7 @@ namespace crnlib
             m_faces[face_index][level_index] = pMip;
 
             const crnlib::vector<uint8>& image_data = kt.get_image_data(level_index, 0, face_index, 0);
-            
+
             if (is_compressed_texture)
             {
                const uint bytes_per_block = pixel_format_helpers::get_dxt_bytes_per_block(m_format);
@@ -1631,7 +1632,7 @@ namespace crnlib
                }
 
                CRNLIB_ASSERT(pDXTImage->get_element_vec().size() * sizeof(dxt_image::element) == level_pitch);
-               
+
                memcpy(&pDXTImage->get_element_vec()[0], image_data.get_ptr(), image_data.size());
 
                if ((m_format == PIXEL_FMT_DXT1) && (!dxt1_alpha))
@@ -1649,7 +1650,7 @@ namespace crnlib
                pImage->set_comp_flags(m_comp_flags);
 
                const uint8* pSrc = image_data.get_ptr();
-                                             
+
                color_quad_u8 q(0, 0, 0, 255);
 
                for (uint y = 0; y < height; y++)
@@ -1673,7 +1674,7 @@ namespace crnlib
 
       if (dxt1_alpha)
          change_dxt1_to_dxt1a();
-      
+
       return true;
    }
 
@@ -1690,12 +1691,12 @@ namespace crnlib
       uint32 ogl_internal_fmt = 0, ogl_fmt = 0, ogl_type = 0;
 
       pixel_packer packer;
-            
+
       if (is_packed())
       {
          switch (get_format())
          {
-            case PIXEL_FMT_DXT1: 
+            case PIXEL_FMT_DXT1:
             {
                ogl_internal_fmt = KTX_COMPRESSED_RGB_S3TC_DXT1_EXT;
                break;
@@ -1762,8 +1763,8 @@ namespace crnlib
             }
          }
       }
-      
-      ktx_texture kt;      
+
+      ktx_texture kt;
       bool success;
       if (determine_texture_type() == cTextureTypeCubemap)
          success = kt.init_cubemap(get_width(), get_num_levels(), ogl_internal_fmt, ogl_fmt, ogl_type);
@@ -1771,20 +1772,20 @@ namespace crnlib
          success = kt.init_2D(get_width(), get_height(), get_num_levels(), ogl_internal_fmt, ogl_fmt, ogl_type);
       if (!success)
          return false;
-            
+
       dynamic_string fourcc_str(cVarArg, "%c%c%c%c", m_format & 0xFF, (m_format >> 8) & 0xFF, (m_format >> 16) & 0xFF, (m_format >> 24) & 0xFF);
       kt.add_key_value("CRNLIB_FOURCC", fourcc_str.get_ptr());
 
       const mip_level* pLevel0 = get_level(0, 0);
       dynamic_string ktx_orient_str(cVarArg, "S=%c,T=%c", (pLevel0->get_orientation_flags() & cOrientationFlagXFlipped) ? 'l' : 'r', (pLevel0->get_orientation_flags() & cOrientationFlagYFlipped) ? 'u' : 'd');
       kt.add_key_value("KTXorientation", ktx_orient_str.get_ptr());
-      
+
       for (uint face_index = 0; face_index < get_num_faces(); face_index++)
       {
          for (uint level_index = 0; level_index < get_num_levels(); level_index++)
          {
             const mip_level* pLevel = get_level(face_index, level_index);
-            
+
             const uint mip_width = pLevel->get_width();
             const uint mip_height = pLevel->get_height();
 
@@ -1804,7 +1805,7 @@ namespace crnlib
                for (uint y = 0; y < mip_height; y++)
                   for (uint x = 0; x < mip_width; x++)
                      pDst = (uint8*)packer.pack(p->get_unclamped(x, y), pDst);
-               
+
                kt.add_image(face_index, level_index, tmp.get_ptr(), tmp.size_in_bytes());
             }
          }
@@ -1936,7 +1937,7 @@ namespace crnlib
       m_format = fmt;
       if (pName)
          m_name.set(pName);
-      
+
       m_faces.resize(faces);
       for (uint f = 0; f < faces; f++)
       {
@@ -2776,11 +2777,11 @@ namespace crnlib
 
       return true;
    }
-   
+
    bool mipmapped_texture::read_from_file(const char* pFilename, texture_file_types::format file_format)
    {
       clear();
-      
+
       set_last_error("Can't open file");
 
       bool success = false;
@@ -2791,20 +2792,20 @@ namespace crnlib
          data_stream_serializer serializer(in_stream);
          success = read_from_stream(serializer, file_format);
       }
-            
+
       return success;
    }
 
    bool mipmapped_texture::read_from_stream(data_stream_serializer& serializer, texture_file_types::format file_format)
    {
       clear();
-      
+
       if (!serializer.get_stream())
       {
          set_last_error("Invalid stream");
          return false;
       }
-      
+
       if (file_format == texture_file_types::cFormatInvalid)
          file_format = texture_file_types::determine_file_format(serializer.get_name().get_ptr());
 
@@ -2813,7 +2814,7 @@ namespace crnlib
          set_last_error("Unsupported file format");
          return false;
       }
-      
+
       set_last_error("Image file load failed");
 
       bool success = false;
@@ -2860,7 +2861,7 @@ namespace crnlib
 
       return success;
    }
-   
+
    bool mipmapped_texture::read_regular_image(data_stream_serializer &serializer, texture_file_types::format file_format)
    {
       file_format;
@@ -3057,7 +3058,7 @@ namespace crnlib
 
       if (file_format == texture_file_types::cFormatInvalid)
          file_format = texture_file_types::determine_file_format(pFilename);
-      
+
       if (file_format == texture_file_types::cFormatInvalid)
       {
          set_last_error("Unknown file format");
@@ -3066,7 +3067,7 @@ namespace crnlib
 
       bool success = false;
 
-      if ( ((pComp_params) && (file_format == texture_file_types::cFormatDDS)) || 
+      if ( ((pComp_params) && (file_format == texture_file_types::cFormatDDS)) ||
            (file_format == texture_file_types::cFormatCRN) )
       {
          if (!pComp_params)
@@ -3127,7 +3128,7 @@ namespace crnlib
 
       return true;
    }
-   
+
    void mipmapped_texture::print_crn_comp_params(const crn_comp_params& p)
    {
       console::debug("CRN compression params:");
@@ -3240,14 +3241,14 @@ namespace crnlib
    void mipmapped_texture::set_orientation_flags(orientation_flags_t flags)
    {
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             m_faces[l][m]->set_orientation_flags(flags);
    }
 
    bool mipmapped_texture::is_flipped() const
    {
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (m_faces[l][m]->is_flipped())
                return true;
 
@@ -3257,7 +3258,7 @@ namespace crnlib
    bool mipmapped_texture::is_x_flipped() const
    {
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (m_faces[l][m]->is_x_flipped())
                return true;
 
@@ -3267,7 +3268,7 @@ namespace crnlib
    bool mipmapped_texture::is_y_flipped() const
    {
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (m_faces[l][m]->is_y_flipped())
                return true;
 
@@ -3283,7 +3284,7 @@ namespace crnlib
          return true;
 
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (!m_faces[l][m]->can_unflip_without_unpacking())
                return false;
 
@@ -3299,7 +3300,7 @@ namespace crnlib
       {
          // The texture is packed - make sure all faces/miplevels can be consistently unflipped.
          bool can_do_packed_unflip = can_unflip_without_unpacking();
-         
+
          if ((!can_do_packed_unflip) && (!allow_unpacking_to_flip))
             return false;
 
@@ -3309,7 +3310,7 @@ namespace crnlib
       }
 
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (!m_faces[l][m]->unflip(true, false))
                return false;
 
@@ -3322,7 +3323,7 @@ namespace crnlib
    bool mipmapped_texture::flip_x()
    {
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (!m_faces[l][m]->flip_x())
                return false;
 
@@ -3333,7 +3334,7 @@ namespace crnlib
    bool mipmapped_texture::flip_y_helper()
    {
       for (uint l = 0; l < m_faces.size(); l++)
-         for (uint m = 0; m < m_faces[l].size(); m++) 
+         for (uint m = 0; m < m_faces[l].size(); m++)
             if (!m_faces[l][m]->flip_y())
                return false;
 
@@ -3351,7 +3352,7 @@ namespace crnlib
             return false;
       }
       swap(temp_tex);
-      
+
       if (update_orientation_flags)
       {
          for (uint f = 0; f < get_num_faces(); f++)
@@ -3364,9 +3365,9 @@ namespace crnlib
             }
          }
       }
-      
+
       CRNLIB_ASSERT(check());
-      
+
       return true;
    }
 
