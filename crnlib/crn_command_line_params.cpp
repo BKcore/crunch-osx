@@ -17,14 +17,14 @@ namespace crnlib
    void get_command_line_as_single_string(dynamic_string& cmd_line, int argc, char *argv[])
    {
       argc, argv;
-#if CRNLIB_USE_WIN32_API
+#if false && CRNLIB_USE_WIN32_API // THIS DOES NOT WORK PROPERLY, ADDING TOO MANY QUOTES, SO WE IGNORE IT.
       cmd_line.set(GetCommandLineA());
 #else
       cmd_line.clear();
       for (int i = 0; i < argc; i++)
       {
          dynamic_string tmp(argv[i]);
-         if ((tmp.front() != '"') && (tmp.front() != '-') && (tmp.front() != '@'))
+         if ((tmp.front() != '"') && (tmp.front() != '-') && (tmp.front() != '@')) 
             tmp = "\"" + tmp + "\"";
          if (cmd_line.get_len())
             cmd_line += " ";
